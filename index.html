@@ -13,6 +13,7 @@
             display: flex; 
             align-items: center; 
             justify-content: center;
+            margin: 0;
         }
         .menu-container {
             width: 100%;
@@ -27,11 +28,11 @@
             text-align: center;
         }
         .logo-area {
-            font-size: 3rem;
+            font-size: 3.5rem;
             color: #0056b3;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
-        h4 { color: #333; font-weight: 700; margin-bottom: 25px; }
+        h4 { color: #333; font-weight: 700; margin-bottom: 30px; letter-spacing: 1px; }
         
         /* Command Button Style */
         .btn-command {
@@ -40,8 +41,8 @@
             justify-content: flex-start;
             gap: 20px;
             width: 100%;
-            padding: 20px;
-            margin-bottom: 15px;
+            padding: 18px;
+            margin-bottom: 20px;
             border: none;
             border-radius: 15px;
             color: white;
@@ -51,31 +52,36 @@
             text-decoration: none;
         }
         
+        /* Warna Tombol Pendaftaran */
         .btn-pendaftaran {
             background: linear-gradient(135deg, #007bff, #0056b3);
             box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
         }
         
+        /* Warna Tombol Monitoring */
         .btn-monitoring {
             background: linear-gradient(135deg, #2ecc71, #27ae60);
             box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
         }
 
         .btn-command:active {
-            transform: scale(0.95);
+            transform: scale(0.96);
         }
 
         .btn-command i {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             background: rgba(255,255,255,0.2);
             padding: 10px;
-            border-radius: 10px;
+            border-radius: 12px;
+            width: 45px;
+            text-align: center;
         }
 
         .footer-text {
-            margin-top: 20px;
-            font-size: 0.8rem;
-            color: #777;
+            margin-top: 15px;
+            font-size: 0.75rem;
+            color: #888;
+            font-style: italic;
         }
     </style>
 </head>
@@ -86,20 +92,20 @@
         <div class="logo-area">
             <i class="fas fa-wifi"></i>
         </div>
-        <h4>WIFI MANAGEMENT</h4>
+        <h4>WIFI MANAGER</h4>
         
-        <a href="index(2).html" class="btn-command btn-pendaftaran">
+        <a href="index (2).html" class="btn-command btn-pendaftaran">
             <i class="fas fa-user-plus"></i>
             <span>Pendaftaran Baru</span>
         </a>
 
-        <a href="index(3).html" class="btn-command btn-monitoring">
-            <i class="fas fa-tasks"></i>
+        <a href="index (3).html" class="btn-command btn-monitoring">
+            <i class="fas fa-chart-line"></i>
             <span>Monitoring Progres</span>
         </a>
 
         <div class="footer-text">
-            v1.0 - Terintegrasi Google Sheets & WhatsApp
+            © 2024 WiFi System v1.2
         </div>
     </div>
 </div>
