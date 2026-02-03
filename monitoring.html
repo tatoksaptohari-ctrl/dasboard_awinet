@@ -1,176 +1,36 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Teknisi - AwiNet</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', sans-serif; background: #f0f4f8; 
-            display: flex; justify-content: center; padding: 20px; 
-            padding-top: 70px; /* Jarak agar tidak tertutup tombol kembali */
-            min-height: 100vh;
-        }
+    // 1. Ambil data dari localStorage
+    let tasks = JSON.parse(localStorage.getItem('awinet_tasks')) || [];
+    let lastDate = localStorage.getItem('awinet_last_date');
 
-        /* Tombol Kembali Mengambang */
-        .btn-back-container {
-            position: absolute; top: 15px; left: 15px; z-index: 1000;
-        }
-        .btn-back {
-            background: #0056b3; color: white; padding: 10px 15px; 
-            border-radius: 8px; text-decoration: none; font-weight: bold; 
-            font-size: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            display: flex; align-items: center; gap: 8px;
-        }
+    // 2. Fungsi Cek Hari Baru
+    function checkNewDay() {
+        const today = new Date().toLocaleDateString('en-CA'); // Format YYYY-MM-DD
 
-        .container { width: 100%; max-width: 550px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        header { text-align: center; margin-bottom: 20px; }
-        .progress-section { margin-bottom: 20px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #eee; }
-        .progress-bar { background: #ecf0f1; height: 12px; border-radius: 10px; overflow: hidden; margin-top: 5px; }
-        #progressFill { background: #27ae60; height: 100%; width: 0%; transition: width 0.4s ease; }
+        if (lastDate && lastDate !== today) {
+            // FILTER: Hanya simpan tugas yang statusnya BUKAN 'done'
+            const pendingTasks = tasks.filter(t => t.status !== 'done');
+            
+            // Hitung berapa tugas yang dihapus untuk notifikasi
+            const deletedCount = tasks.length - pendingTasks.length;
+            
+            if (deletedCount > 0) {
+                tasks = pendingTasks;
+                saveAndRender(); // Simpan perubahan ke localStorage
+                alert(`${deletedCount} tugas yang sudah Selesai (Done) telah dibersihkan untuk hari baru.`);
+            }
+        }
         
-        .input-card { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 10px; }
-        input, select, button { padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
-        .btn-add { background: #007bff; color: white; font-weight: bold; cursor: pointer; border: none; }
-        .btn-wa { background: #25d366; color: white; font-weight: bold; cursor: pointer; border: none; width: 100%; margin-top: 10px; padding: 15px; font-size: 1rem; }
-        
-        .task-list { margin-top: 20px; }
-        .task-item { 
-            background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; 
-            border-left: 5px solid #ddd; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .task-info b { display: block; color: #333; }
-        .task-info span { font-size: 0.85rem; color: #666; }
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .status-todo { background: #ffebee; color: #c62828; }
-        .status-doing { background: #fff3e0; color: #ef6c00; }
-        .status-done { background: #e8f5e9; color: #2e7d32; border-left-color: #27ae60; }
-    </style>
-</head>
-<body>
+        // Update tanggal terakhir ke hari ini
+        localStorage.setItem('awinet_last_date', today);
+    }
 
-    <div class="btn-back-container">
-        <a href="index.html" class="btn-back">
-            <i class="fas fa-arrow-left"></i> MENU UTAMA
-        </a>
-    </div>
+    // 3. Jalankan pengecekan saat halaman dibuka
+    checkNewDay();
 
-    <div class="container">
-        <header>
-            <h2>Monitoring Progres</h2>
-            <p style="color: #666; font-size: 0.9rem;">Kelola Tugas & Kirim ke WhatsApp</p>
-        </header>
+    // --- Fungsi lainnya tetap sama ---
 
-        <div class="progress-section">
-            <div style="display: flex; justify-content: space-between; font-weight: bold;">
-                <span>Total Progres</span>
-                <span id="progressPercent">0%</span>
-            </div>
-            <div class="progress-bar"><div id="progressFill"></div></div>
-        </div>
-
-        <div class="input-card">
-            <input type="text" id="taskText" placeholder="Nama Tugas / Pekerjaan...">
-            <input type="text" id="workerName" placeholder="Nama Teknisi...">
-            <input type="date" id="deadlineDate">
-            <button class="btn-add" onclick="addTask()">TAMBAH TUGAS</button>
-        </div>
-
-        <div id="taskList" class="task-list"></div>
-
-        <button class="btn-wa" onclick="sendToWA()">
-            <i class="fab fa-whatsapp"></i> KIRIM LAPORAN KE WA
-        </button>
-    </div>
-
-    <script>
-        let tasks = JSON.parse(localStorage.getItem('awinet_tasks')) || [];
-
-        function addTask() {
-            const text = document.getElementById('taskText').value;
-            const worker = document.getElementById('workerName').value;
-            const deadline = document.getElementById('deadlineDate').value;
-
-            if (!text || !worker || !deadline) return alert("Isi semua kolom!");
-
-            const newTask = { id: Date.now(), text, worker, deadline, status: 'todo' };
-            tasks.push(newTask);
-            saveAndRender();
-            
-            document.getElementById('taskText').value = '';
-            document.getElementById('workerName').value = '';
-        }
-
-        function saveAndRender() {
-            localStorage.setItem('awinet_tasks', JSON.stringify(tasks));
-            renderTasks();
-            updateProgress();
-        }
-
-        function renderTasks() {
-            const list = document.getElementById('taskList');
-            list.innerHTML = '';
-            
-            tasks.forEach(t => {
-                const item = document.createElement('div');
-                item.className = `task-item ${t.status === 'done' ? 'status-done' : ''}`;
-                item.innerHTML = `
-                    <div class="task-info">
-                        <b>${t.text}</b>
-                        <span>Teknisi: ${t.worker} | Tgl: ${t.deadline}</span>
-                    </div>
-                    <span class="status-badge status-${t.status}" onclick="updateStatus(${t.id})">
-                        ${t.status}
-                    </div>
-                `;
-                list.appendChild(item);
-            });
-        }
-
-        function updateStatus(id) {
-            const task = tasks.find(t => t.id === id);
-            const cycle = ['todo', 'doing', 'done'];
-            task.status = cycle[(cycle.indexOf(task.status) + 1) % 3];
-            saveAndRender();
-        }
-
-        function updateProgress() {
-            const completed = tasks.filter(t => t.status === 'done').length;
-            const percent = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
-            document.getElementById('progressFill').style.width = percent + '%';
-            document.getElementById('progressPercent').innerText = percent + '%';
-        }
-
-        function sendToWA() {
-            if (tasks.length === 0) return alert("Belum ada tugas!");
-            
-            const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-            
-            let message = "*LAPORAN PROGRES HARIAN TEKNISI*\n";
-            message += "--------------------------------------\n";
-            
-            tasks.forEach((t, i) => {
-                const dateObj = new Date(t.deadline);
-                const hari = namaHari[dateObj.getDay()];
-                let s = t.status === 'done' ? "✅ SELESAI" : t.status === 'doing' ? "⏳ PROSES" : "❌ TODO";
-                
-                message += `${i+1}. *${t.text}*\n`;
-                message += `   Hari: ${hari}, ${t.deadline}\n`;
-                message += `   Teknisi: ${t.worker}\n`;
-                message += `   Status: ${s}\n\n`;
-            });
-
-            const progress = document.getElementById('progressPercent').innerText;
-            message += `--------------------------------------\n*TOTAL PROGRES: ${progress}*`;
-
-            window.open("https://wa.me/?text=" + encodeURIComponent(message), '_blank');
-        }
-
+    function saveAndRender() {
+        localStorage.setItem('awinet_tasks', JSON.stringify(tasks));
         renderTasks();
         updateProgress();
-    </script>
-</body>
-</html>
+    }
