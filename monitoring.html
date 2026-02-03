@@ -3,145 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Teknisi - WA Integrated</title>
+    <title>Monitoring Teknisi - AwiNet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; display: flex; justify-content: center; padding: 20px; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; background: #f0f4f8; 
+            display: flex; justify-content: center; padding: 20px; 
+            padding-top: 70px; /* Jarak agar tidak tertutup tombol kembali */
+            min-height: 100vh;
+        }
+
+        /* Tombol Kembali Mengambang */
+        .btn-back-container {
+            position: absolute; top: 15px; left: 15px; z-index: 1000;
+        }
+        .btn-back {
+            background: #0056b3; color: white; padding: 10px 15px; 
+            border-radius: 8px; text-decoration: none; font-weight: bold; 
+            font-size: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 8px;
+        }
+
         .container { width: 100%; max-width: 550px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         header { text-align: center; margin-bottom: 20px; }
         .progress-section { margin-bottom: 20px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #eee; }
         .progress-bar { background: #ecf0f1; height: 12px; border-radius: 10px; overflow: hidden; margin-top: 5px; }
         #progressFill { background: #27ae60; height: 100%; width: 0%; transition: width 0.4s ease; }
-        .input-card { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 10px; }
-        input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
-        .row { display: flex; gap: 10px; }
-        .row input { flex: 1; }
-        button { cursor: pointer; font-weight: bold; transition: 0.3s; border: none; border-radius: 8px; }
-        #addBtn { background: #2c3e50; color: white; padding: 12px; }
-        #waBtn { background: #25D366; color: white; padding: 12px; width: 100%; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        ul { list-style: none; }
-        li { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f1f1f1; }
-        .task-info { display: flex; flex-direction: column; }
-        .task-name { font-weight: bold; }
-        .task-worker { font-size: 0.85rem; color: #3498db; }
-        .status-btn { padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; color: white; min-width: 90px; }
-        .todo { background: #f39c12; } .doing { background: #3498db; } .done { background: #27ae60; }
+        
+        .input-card { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 10px; }
+        input, select, button { padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
+        .btn-add { background: #007bff; color: white; font-weight: bold; cursor: pointer; border: none; }
+        .btn-wa { background: #25d366; color: white; font-weight: bold; cursor: pointer; border: none; width: 100%; margin-top: 10px; padding: 15px; font-size: 1rem; }
+        
+        .task-list { margin-top: 20px; }
+        .task-item { 
+            background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; 
+            border-left: 5px solid #ddd; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .task-info b { display: block; color: #333; }
+        .task-info span { font-size: 0.85rem; color: #666; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .status-todo { background: #ffebee; color: #c62828; }
+        .status-doing { background: #fff3e0; color: #ef6c00; }
+        .status-done { background: #e8f5e9; color: #2e7d32; border-left-color: #27ae60; }
     </style>
 </head>
 <body>
-<div style="position: absolute; top: 15px; left: 15px; z-index: 1000;">
-    <a href="index.html" class="btn btn-primary shadow" style="border-radius: 8px; font-weight: bold; padding: 8px 15px; text-decoration: none;">
-        <i class="fas fa-arrow-left"></i> MENU UTAMA
-    </a>
-</div>
 
-<style>
-    body {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start; /* Agar tidak terlalu mentok atas jika layar pendek */
-        padding-top: 70px; /* Memberi ruang agar tidak tertabrak tombol di atas */
-        min-height: 100vh;
-        background-color: #f0f2f5;
-    }
-</style>
-
-<div class="container">
-    <header>
-        <h1>Monitoring Teknisi</h1>
-        <p>Laporan Progres Harian</p>
-    </header>
-
-    <div class="progress-section">
-        <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:bold;">
-            <span>Total Progres</span>
-            <span id="progressPercent">0%</span>
-        </div>
-        <div class="progress-bar"><div id="progressFill"></div></div>
+    <div class="btn-back-container">
+        <a href="index.html" class="btn-back">
+            <i class="fas fa-arrow-left"></i> MENU UTAMA
+        </a>
     </div>
 
-    <div class="input-card">
-        <input type="text" id="taskInput" placeholder="Jenis Pekerjaan">
-        <div class="row">
-            <input type="text" id="workerInput" placeholder="Nama Teknisi">
-            <input type="date" id="dateInput">
-        </div>
-        <button onclick="addTask()" id="addBtn">Tambah Jadwal</button>
-    </div>
+    <div class="container">
+        <header>
+            <h2>Monitoring Progres</h2>
+            <p style="color: #666; font-size: 0.9rem;">Kelola Tugas & Kirim ke WhatsApp</p>
+        </header>
 
-    <ul id="taskList"></ul>
-
-    <button onclick="sendToWA()" id="waBtn">
-        <span>Kirim Laporan ke WhatsApp Group</span>
-    </button>
-</div>
-
-<script>
-    let tasks = JSON.parse(localStorage.getItem('myTechSchedule')) || [];
-    window.onload = render;
-
-    function addTask() {
-        const t = document.getElementById('taskInput'), w = document.getElementById('workerInput'), d = document.getElementById('dateInput');
-        if (!t.value || !w.value || !d.value) return alert("Isi semua data!");
-        tasks.push({ id: Date.now(), text: t.value, worker: w.value, deadline: d.value, status: 'todo' });
-        saveAndRender();
-        t.value = ''; w.value = ''; d.value = '';
-    }
-
-    function saveAndRender() {
-        localStorage.setItem('myTechSchedule', JSON.stringify(tasks));
-        render();
-    }
-
-    function render() {
-        const list = document.getElementById('taskList');
-        list.innerHTML = '';
-        tasks.forEach(task => {
-            const li = document.createElement('li');
-            li.innerHTML = `<div class="task-info">
-                <span class="task-name">${task.text}</span>
-                <span class="task-worker">🛠️ Teknisi: ${task.worker}</span>
-                <small>📅 ${task.deadline}</small>
+        <div class="progress-section">
+            <div style="display: flex; justify-content: space-between; font-weight: bold;">
+                <span>Total Progres</span>
+                <span id="progressPercent">0%</span>
             </div>
-            <button class="status-btn ${task.status}" onclick="updateStatus(${task.id})">${task.status.toUpperCase()}</button>`;
-            list.appendChild(li);
-        });
+            <div class="progress-bar"><div id="progressFill"></div></div>
+        </div>
+
+        <div class="input-card">
+            <input type="text" id="taskText" placeholder="Nama Tugas / Pekerjaan...">
+            <input type="text" id="workerName" placeholder="Nama Teknisi...">
+            <input type="date" id="deadlineDate">
+            <button class="btn-add" onclick="addTask()">TAMBAH TUGAS</button>
+        </div>
+
+        <div id="taskList" class="task-list"></div>
+
+        <button class="btn-wa" onclick="sendToWA()">
+            <i class="fab fa-whatsapp"></i> KIRIM LAPORAN KE WA
+        </button>
+    </div>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('awinet_tasks')) || [];
+
+        function addTask() {
+            const text = document.getElementById('taskText').value;
+            const worker = document.getElementById('workerName').value;
+            const deadline = document.getElementById('deadlineDate').value;
+
+            if (!text || !worker || !deadline) return alert("Isi semua kolom!");
+
+            const newTask = { id: Date.now(), text, worker, deadline, status: 'todo' };
+            tasks.push(newTask);
+            saveAndRender();
+            
+            document.getElementById('taskText').value = '';
+            document.getElementById('workerName').value = '';
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('awinet_tasks', JSON.stringify(tasks));
+            renderTasks();
+            updateProgress();
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            
+            tasks.forEach(t => {
+                const item = document.createElement('div');
+                item.className = `task-item ${t.status === 'done' ? 'status-done' : ''}`;
+                item.innerHTML = `
+                    <div class="task-info">
+                        <b>${t.text}</b>
+                        <span>Teknisi: ${t.worker} | Tgl: ${t.deadline}</span>
+                    </div>
+                    <span class="status-badge status-${t.status}" onclick="updateStatus(${t.id})">
+                        ${t.status}
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function updateStatus(id) {
+            const task = tasks.find(t => t.id === id);
+            const cycle = ['todo', 'doing', 'done'];
+            task.status = cycle[(cycle.indexOf(task.status) + 1) % 3];
+            saveAndRender();
+        }
+
+        function updateProgress() {
+            const completed = tasks.filter(t => t.status === 'done').length;
+            const percent = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressPercent').innerText = percent + '%';
+        }
+
+        function sendToWA() {
+            if (tasks.length === 0) return alert("Belum ada tugas!");
+            
+            const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            
+            let message = "*LAPORAN PROGRES HARIAN TEKNISI*\n";
+            message += "--------------------------------------\n";
+            
+            tasks.forEach((t, i) => {
+                const dateObj = new Date(t.deadline);
+                const hari = namaHari[dateObj.getDay()];
+                let s = t.status === 'done' ? "✅ SELESAI" : t.status === 'doing' ? "⏳ PROSES" : "❌ TODO";
+                
+                message += `${i+1}. *${t.text}*\n`;
+                message += `   Hari: ${hari}, ${t.deadline}\n`;
+                message += `   Teknisi: ${t.worker}\n`;
+                message += `   Status: ${s}\n\n`;
+            });
+
+            const progress = document.getElementById('progressPercent').innerText;
+            message += `--------------------------------------\n*TOTAL PROGRES: ${progress}*`;
+
+            window.open("https://wa.me/?text=" + encodeURIComponent(message), '_blank');
+        }
+
+        renderTasks();
         updateProgress();
-    }
-
-    function updateStatus(id) {
-        const task = tasks.find(t => t.id === id);
-        const cycle = ['todo', 'doing', 'done'];
-        task.status = cycle[(cycle.indexOf(task.status) + 1) % 3];
-        saveAndRender();
-    }
-
-    function updateProgress() {
-        const completed = tasks.filter(t => t.status === 'done').length;
-        const percent = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
-        document.getElementById('progressFill').style.width = percent + '%';
-        document.getElementById('progressPercent').innerText = percent + '%';
-    }
-
-    function sendToWA() {
-        if (tasks.length === 0) return alert("Belum ada tugas untuk dilaporkan!");
-        
-        let message = "*LAPORAN PROGRES HARIAN TEKNISI*\n";
-        message += "--------------------------------------\n";
-        
-        tasks.forEach((t, i) => {
-            let s = t.status === 'done' ? "✅ SELESAI" : t.status === 'doing' ? "⏳ PROSES" : "❌ TODO";
-            message += `${i+1}. *${t.text}*\n   Teknisi: ${t.worker}\n   Status: ${s}\n\n`;
-        });
-
-        const progress = document.getElementById('progressPercent').innerText;
-        message += `--------------------------------------\n*TOTAL PROGRES: ${progress}*`;
-
-        // Membuka WhatsApp (Ini akan membuka daftar chat, Anda tinggal pilih grupnya)
-        const url = "https://wa.me/?text=" + encodeURIComponent(message);
-        window.open(url, '_blank');
-    }
-</script>
-
+    </script>
 </body>
 </html>
