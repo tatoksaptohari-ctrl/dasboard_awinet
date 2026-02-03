@@ -29,11 +29,22 @@
     </style>
 </head>
 <body>
-<div class="container mt-3">
-    <a href="index.html" class="btn btn-dark shadow-sm" style="border-radius: 10px; font-weight: bold;">
-        <i class="fas fa-arrow-left"></i> ← KEMBALI KE MENU UTAMA
+<div style="position: absolute; top: 15px; left: 15px; z-index: 1000;">
+    <a href="index.html" class="btn btn-primary shadow" style="border-radius: 8px; font-weight: bold; padding: 8px 15px; text-decoration: none;">
+        <i class="fas fa-arrow-left"></i> MENU UTAMA
     </a>
 </div>
+
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start; /* Agar tidak terlalu mentok atas jika layar pendek */
+        padding-top: 70px; /* Memberi ruang agar tidak tertabrak tombol di atas */
+        min-height: 100vh;
+        background-color: #f0f2f5;
+    }
+</style>
 
 <div class="container">
     <header>
