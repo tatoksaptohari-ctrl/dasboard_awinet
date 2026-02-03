@@ -76,11 +76,19 @@
         </div>
 
         <div class="input-card">
-            <input type="text" id="taskText" placeholder="Nama Pekerjaan (Contoh: Pasang ODP)">
-            <input type="text" id="workerName" placeholder="Nama Teknisi">
-            <input type="date" id="deadlineDate">
-            <button class="btn-add" onclick="addTask()">TAMBAH KE DAFTAR</button>
-        </div>
+    <input type="text" id="taskText" placeholder="Nama Pekerjaan (Contoh: Pasang ODP)">
+    <input type="text" id="workerName" placeholder="Nama Teknisi">
+    
+    <div style="text-align: left; margin-top: 5px;">
+        <label for="deadlineDate" style="font-size: 0.85rem; font-weight: bold; color: #555; margin-left: 5px;">
+            <i class="fas fa-calendar-alt"></i> Tanggal Pelaksanaan:
+        </label>
+        <input type="date" id="deadlineDate" style="width: 100%; margin-top: 5px;">
+    </div>
+
+    <button class="btn-add" onclick="addTask()">TAMBAH KE DAFTAR</button>
+</div>
+
 
         <div id="taskList" class="task-list"></div>
 
