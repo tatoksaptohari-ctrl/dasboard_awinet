@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Menu Utama - Aplikasi WiFi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { 
+            background: linear-gradient(135deg, #f0f2f5 0%, #c3cfe2 100%); 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+        .menu-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+        .card-menu {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .logo-area {
+            font-size: 3rem;
+            color: #0056b3;
+            margin-bottom: 10px;
+        }
+        h4 { color: #333; font-weight: 700; margin-bottom: 25px; }
+        
+        /* Command Button Style */
+        .btn-command {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 20px;
+            width: 100%;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-pendaftaran {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+        
+        .btn-monitoring {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-command:active {
+            transform: scale(0.95);
+        }
+
+        .btn-command i {
+            font-size: 1.5rem;
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .footer-text {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+<div class="menu-container">
+    <div class="card-menu">
+        <div class="logo-area">
+            <i class="fas fa-wifi"></i>
+        </div>
+        <h4>WIFI MANAGEMENT</h4>
+        
+        <a href="index(2).html" class="btn-command btn-pendaftaran">
+            <i class="fas fa-user-plus"></i>
+            <span>Pendaftaran Baru</span>
+        </a>
+
+        <a href="index(3).html" class="btn-command btn-monitoring">
+            <i class="fas fa-tasks"></i>
+            <span>Monitoring Progres</span>
+        </a>
+
+        <div class="footer-text">
+            v1.0 - Terintegrasi Google Sheets & WhatsApp
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
