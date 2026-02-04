@@ -109,25 +109,39 @@
         }
 
         async function addTask() {
-            const text = document.getElementById('taskText').value;
-            const worker = document.getElementById('workerName').value;
-            const deadline = document.getElementById('deadlineDate').value;
+    const text = document.getElementById('taskText').value;
+    const worker = document.getElementById('workerName').value;
+    const deadline = document.getElementById('deadlineDate').value;
 
-            if (!text || !worker || !deadline) return alert("Mohon lengkapi semua data!");
+    if (!text || !worker || !deadline) return alert("Isi semua data!");
 
-            showLoading(true);
-            const data = { action: "add", id: Date.now(), text, worker, deadline, status: 'todo' };
+    showLoading(true);
+    
+    // Menggunakan URLSearchParams agar lebih kompatibel dengan Google Script
+    const payload = {
+        action: "add",
+        id: Date.now().toString(),
+        text: text,
+        worker: worker,
+        deadline: deadline,
+        status: 'todo'
+    };
 
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(data)
-            });
+    try {
+        await fetch(scriptURL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        alert("Data terkirim ke server!");
+    } catch (e) {
+        alert("Gagal mengirim ke server!");
+    }
 
-            setTimeout(loadTasks, 1500);
-            document.getElementById('taskText').value = '';
-            document.getElementById('workerName').value = '';
-        }
+    setTimeout(loadTasks, 2000); // Tunggu 2 detik agar sheet terupdate
+    document.getElementById('taskText').value = '';
+    document.getElementById('workerName').value = '';
+}
+
 
         async function updateStatus(id) {
             const task = tasks.find(t => t.id == id);
