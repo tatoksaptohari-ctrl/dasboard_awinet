@@ -197,20 +197,30 @@
         }
 
         function sendToWA() {
-            if (tasks.length === 0) return alert("Data kosong!");
-            const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-            let message = "*LAPORAN PROGRES HARIAN TEKNISI*\n--------------------------------------\n";
-            
-            tasks.forEach((t, i) => {
-                const dateObj = new Date(t.deadline);
-                const hari = namaHari[dateObj.getDay()];
-                let s = t.status === 'done' ? "✅ SELESAI" : t.status === 'doing' ? "⏳ PROSES" : "❌ TODO";
-                message += `${i+1}. *${t.text}*\nHari: ${hari}, ${t.deadline}\nTeknisi: ${t.worker}\nStatus: ${s}\n\n`;
-            });
-            
-            message += `--------------------------------------\n*TOTAL PROGRES: ${document.getElementById('progressPercent').innerText}*`;
-            window.open("https://wa.me/?text=" + encodeURIComponent(message));
-        }
+    if (tasks.length === 0) return alert("Belum ada tugas!");
+    
+    const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    let message = "*LAPORAN PROGRES HARIAN TEKNISI*\n--------------------------------------\n";
+    
+    tasks.forEach((t, i) => {
+        const dateObj = new Date(t.deadline);
+        const hari = namaHari[dateObj.getDay()];
+        let s = t.status === 'done' ? "✅ SELESAI" : t.status === 'doing' ? "⏳ PROSES" : "❌ TODO";
+        message += `${i+1}. *${t.text}*\nHari: ${hari}, ${t.deadline}\nTeknisi: ${t.worker}\nStatus: ${s}\n\n`;
+    });
+
+    const progress = document.getElementById('progressPercent').innerText;
+    message += `--------------------------------------\n*TOTAL PROGRES: ${progress}*`;
+
+    // 1. Buka WhatsApp di tab baru
+    window.open("https://wa.me/?text=" + encodeURIComponent(message), '_blank');
+
+    // 2. Tunggu sebentar lalu arahkan halaman kembali ke menu utama
+    setTimeout(function() {
+        window.location.href = "index.html";
+    }, 1000); // Jeda 1 detik agar proses buka WA tidak terganggu
+}
+
 
         checkNewDay();
         loadTasks();
