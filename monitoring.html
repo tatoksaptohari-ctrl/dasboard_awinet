@@ -7,39 +7,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', sans-serif; background: #f0f4f8; 
-            display: flex; justify-content: center; padding: 20px; 
-            padding-top: 80px; min-height: 100vh; 
-        }
-
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; display: flex; justify-content: center; padding: 20px; padding-top: 80px; min-height: 100vh; }
+        
         /* Tombol Kembali Melayang */
         .btn-back-container { position: absolute; top: 15px; left: 15px; z-index: 1000; }
-        .btn-back { 
-            background: #007bff; color: white; padding: 10px 15px; 
-            border-radius: 8px; text-decoration: none; font-weight: bold; 
-            font-size: 12px; display: flex; align-items: center; gap: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
+        .btn-back { background: #007bff; color: white; padding: 10px 15px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        
         .container { width: 100%; max-width: 550px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         header { text-align: center; margin-bottom: 20px; }
         .logo-img { max-width: 150px; height: auto; margin-bottom: 10px; }
-
+        
         .progress-section { margin-bottom: 20px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #eee; }
         .progress-bar { background: #ecf0f1; height: 12px; border-radius: 10px; overflow: hidden; margin-top: 5px; }
         #progressFill { background: #27ae60; height: 100%; width: 0%; transition: width 0.4s ease; }
-
+        
         .input-card { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 10px; }
         input, button { padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
         .btn-add { background: #007bff; color: white; font-weight: bold; cursor: pointer; border: none; }
         .btn-wa { background: #25d366; color: white; font-weight: bold; cursor: pointer; border: none; width: 100%; margin-top: 10px; padding: 15px; font-size: 1rem; }
-
-        .task-item { 
-            background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; 
-            border-left: 5px solid #ddd; display: flex; justify-content: space-between; align-items: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-        }
+        
+        .task-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #ddd; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
         .status-todo { background: #ffebee; color: #c62828; }
         .status-doing { background: #fff3e0; color: #ef6c00; }
@@ -60,7 +47,7 @@
             <h3>Monitoring Progres (Cloud)</h3>
         </header>
 
-        <div id="loading"><i class="fas fa-spinner fa-spin"></i> Menghubungkan ke Server...</div>
+        <div id="loading"><i class="fas fa-spinner fa-spin"></i> Memproses ke Cloud...</div>
 
         <div class="progress-section">
             <div style="display: flex; justify-content: space-between; font-weight: bold;">
@@ -73,20 +60,16 @@
         <div class="input-card">
             <input type="text" id="taskText" placeholder="Nama Pekerjaan">
             <input type="text" id="workerName" placeholder="Nama Teknisi">
-            
-            <div style="text-align: left; margin-top: 5px;">
-                <label style="font-size: 0.85rem; font-weight: bold; color: #555;">
-                    <i class="fas fa-calendar-alt"></i> Tanggal Pelaksanaan:
-                </label>
-                <input type="date" id="deadlineDate" style="width: 100%; margin-top: 5px;">
+            <div style="text-align: left;">
+                <label style="font-size: 0.8rem; font-weight: bold; color: #555;">Tanggal Pelaksanaan:</label>
+                <input type="date" id="deadlineDate" style="width: 100%;">
             </div>
-
             <button class="btn-add" onclick="addTask()">SIMPAN KE CLOUD</button>
         </div>
 
         <div id="taskList"></div>
 
-        <button class="btn-wa" onclick="sendToWA()"><i class="fab fa-whatsapp"></i> KIRIM LAPORAN KE WA</button>
+        <button class="btn-wa" onclick="sendToWA()"><i class="fab fa-whatsapp"></i> KIRIM WA & SELESAI</button>
     </div>
 
     <script>
@@ -104,75 +87,37 @@
                 tasks = await response.json();
                 renderTasks();
                 updateProgress();
-            } catch (e) { console.error("Gagal memuat data:", e); }
+            } catch (e) { console.log("Gagal memuat atau data masih kosong"); }
             showLoading(false);
         }
 
         async function addTask() {
-    const text = document.getElementById('taskText').value;
-    const worker = document.getElementById('workerName').value;
-    const deadline = document.getElementById('deadlineDate').value;
-
-    if (!text || !worker || !deadline) return alert("Isi semua data!");
-
-    showLoading(true);
-    
-    // Menggunakan URLSearchParams agar lebih kompatibel dengan Google Script
-    const payload = {
-        action: "add",
-        id: Date.now().toString(),
-        text: text,
-        worker: worker,
-        deadline: deadline,
-        status: 'todo'
-    };
-
-    try {
-        await fetch(scriptURL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-        alert("Data terkirim ke server!");
-    } catch (e) {
-        alert("Gagal mengirim ke server!");
-    }
-
-    setTimeout(loadTasks, 2000); // Tunggu 2 detik agar sheet terupdate
-    document.getElementById('taskText').value = '';
-    document.getElementById('workerName').value = '';
-}
-
-
-        async function updateStatus(id) {
-            const task = tasks.find(t => t.id == id);
-            const cycle = ['todo', 'doing', 'done'];
-            const newStatus = cycle[(cycle.indexOf(task.status) + 1) % 3];
+            const text = document.getElementById('taskText').value;
+            const worker = document.getElementById('workerName').value;
+            const deadline = document.getElementById('deadlineDate').value;
+            if (!text || !worker || !deadline) return alert("Lengkapi data!");
 
             showLoading(true);
             await fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: JSON.stringify({ action: "update", id: id, status: newStatus })
+                body: JSON.stringify({ action: "add", id: Date.now().toString(), text, worker, deadline, status: 'todo' })
             });
-
             setTimeout(loadTasks, 1500);
+            document.getElementById('taskText').value = '';
         }
 
-        async function checkNewDay() {
-            const today = new Date().toLocaleDateString('en-CA');
-            let lastDate = localStorage.getItem('awinet_last_date');
-
-            if (lastDate && lastDate !== today) {
-                showLoading(true);
-                await fetch(scriptURL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ action: "clearDone" })
-                });
-                alert("Hari baru! Tugas selesai kemarin telah dibersihkan.");
-                setTimeout(loadTasks, 1500);
-            }
-            localStorage.setItem('awinet_last_date', today);
+        async function updateStatus(id) {
+            const task = tasks.find(t => t.id == id);
+            const cycle = ['todo', 'doing', 'done'];
+            const newStatus = cycle[(cycle.indexOf(task.status) + 1) % 3];
+            showLoading(true);
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: "update", id: id.toString(), status: newStatus })
+            });
+            setTimeout(loadTasks, 1500);
         }
 
         function renderTasks() {
@@ -181,10 +126,8 @@
             tasks.forEach(t => {
                 const item = document.createElement('div');
                 item.className = `task-item ${t.status === 'done' ? 'status-done' : ''}`;
-                item.innerHTML = `
-                    <div><b>${t.text}</b><br><small>${t.worker} | ${t.deadline}</small></div>
-                    <span class="status-badge status-${t.status}" onclick="updateStatus(${t.id})">${t.status}</span>
-                `;
+                item.innerHTML = `<div><b>${t.text}</b><br><small>${t.worker} | ${t.deadline}</small></div>
+                                  <span class="status-badge status-${t.status}" onclick="updateStatus(${t.id})">${t.status}</span>`;
                 list.appendChild(item);
             });
         }
@@ -197,33 +140,49 @@
         }
 
         function sendToWA() {
-    if (tasks.length === 0) return alert("Belum ada tugas!");
-    
-    const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-    let message = "*LAPORAN PROGRES HARIAN TEKNISI*\n--------------------------------------\n";
-    
-    tasks.forEach((t, i) => {
-        const dateObj = new Date(t.deadline);
-        const hari = namaHari[dateObj.getDay()];
-        let s = t.status === 'done' ? "✅ SELESAI" : t.status === 'doing' ? "⏳ PROSES" : "❌ TODO";
-        message += `${i+1}. *${t.text}*\nHari: ${hari}, ${t.deadline}\nTeknisi: ${t.worker}\nStatus: ${s}\n\n`;
-    });
+            if (tasks.length === 0) return alert("Data kosong!");
+            const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            let message = "*LAPORAN PROGRES HARIAN TEKNISI*\n--------------------------------------\n";
+            
+            tasks.forEach((t, i) => {
+                const dateObj = new Date(t.deadline);
+                const hari = namaHari[dateObj.getDay()];
+                let s = t.status === 'done' ? "✅ SELESAI" : t.status === 'doing' ? "⏳ PROSES" : "❌ TODO";
+                message += `${i+1}. *${t.text}*\nHari: ${hari}, ${t.deadline}\nTeknisi: ${t.worker}\nStatus: ${s}\n\n`;
+            });
+            
+            message += `--------------------------------------\n*TOTAL PROGRES: ${document.getElementById('progressPercent').innerText}*`;
+            
+            // Membuka WhatsApp
+            window.open("https://wa.me/?text=" + encodeURIComponent(message), '_blank');
 
-    const progress = document.getElementById('progressPercent').innerText;
-    message += `--------------------------------------\n*TOTAL PROGRES: ${progress}*`;
+            // Pengalihan paksa kembali ke menu utama
+            setTimeout(() => {
+                window.location.replace("index.html");
+            }, 1000);
+        }
 
-    // 1. Buka WhatsApp di tab baru
-    window.open("https://wa.me/?text=" + encodeURIComponent(message), '_blank');
+        // Pengecekan ganti hari untuk hapus status 'done'
+        async function checkNewDay() {
+            const today = new Date().toLocaleDateString('en-CA');
+            let lastDate = localStorage.getItem('awinet_last_date');
 
-    // 2. Tunggu sebentar lalu arahkan halaman kembali ke menu utama
-    setTimeout(function() {
-        window.location.href = "index.html";
-    }, 1000); // Jeda 1 detik agar proses buka WA tidak terganggu
-}
-
+            if (lastDate && lastDate !== today) {
+                showLoading(true);
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ action: "clearDone" })
+                });
+                localStorage.setItem('awinet_last_date', today);
+                setTimeout(loadTasks, 1500);
+            } else {
+                localStorage.setItem('awinet_last_date', today);
+                loadTasks();
+            }
+        }
 
         checkNewDay();
-        loadTasks();
     </script>
 </body>
 </html>
