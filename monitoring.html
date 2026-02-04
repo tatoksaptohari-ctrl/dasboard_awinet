@@ -8,30 +8,23 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; display: flex; justify-content: center; padding: 20px; padding-top: 80px; min-height: 100vh; }
-        
-        /* Tombol Kembali Melayang */
         .btn-back-container { position: absolute; top: 15px; left: 15px; z-index: 1000; }
         .btn-back { background: #007bff; color: white; padding: 10px 15px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        
         .container { width: 100%; max-width: 550px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         header { text-align: center; margin-bottom: 20px; }
         .logo-img { max-width: 150px; height: auto; margin-bottom: 10px; }
-        
         .progress-section { margin-bottom: 20px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #eee; }
         .progress-bar { background: #ecf0f1; height: 12px; border-radius: 10px; overflow: hidden; margin-top: 5px; }
         #progressFill { background: #27ae60; height: 100%; width: 0%; transition: width 0.4s ease; }
-        
         .input-card { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 10px; }
         input, button { padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
         .btn-add { background: #007bff; color: white; font-weight: bold; cursor: pointer; border: none; }
         .btn-wa { background: #25d366; color: white; font-weight: bold; cursor: pointer; border: none; width: 100%; margin-top: 10px; padding: 15px; font-size: 1rem; }
-        
         .task-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #ddd; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
         .status-todo { background: #ffebee; color: #c62828; }
         .status-doing { background: #fff3e0; color: #ef6c00; }
         .status-done { background: #e8f5e9; color: #2e7d32; border-left-color: #27ae60; }
-        
         #loading { display: none; text-align: center; color: #007bff; margin-bottom: 10px; font-weight: bold; font-size: 0.9rem; }
     </style>
 </head>
@@ -87,7 +80,7 @@
                 tasks = await response.json();
                 renderTasks();
                 updateProgress();
-            } catch (e) { console.log("Gagal memuat atau data masih kosong"); }
+            } catch (e) { console.log("Gagal memuat data"); }
             showLoading(false);
         }
 
@@ -139,8 +132,10 @@
             document.getElementById('progressPercent').innerText = percent + '%';
         }
 
+        // PERBAIKAN: FUNGSI KIRIM WA DENGAN REDIRECT PAKSA
         function sendToWA() {
             if (tasks.length === 0) return alert("Data kosong!");
+            
             const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
             let message = "*LAPORAN PROGRES HARIAN TEKNISI*\n--------------------------------------\n";
             
@@ -153,16 +148,17 @@
             
             message += `--------------------------------------\n*TOTAL PROGRES: ${document.getElementById('progressPercent').innerText}*`;
             
-            // Membuka WhatsApp
-            window.open("https://wa.me/?text=" + encodeURIComponent(message), '_blank');
-
-            // Pengalihan paksa kembali ke menu utama
+            const waUrl = "https://wa.me/?text=" + encodeURIComponent(message);
+            
+            // Trik: Buka WA lalu segera ganti lokasi halaman saat ini
+            window.open(waUrl, '_blank');
+            
+            // Gunakan replace agar history tidak menumpuk dan kembali ke menu utama
             setTimeout(() => {
                 window.location.replace("index.html");
-            }, 1000);
+            }, 500); 
         }
 
-        // Pengecekan ganti hari untuk hapus status 'done'
         async function checkNewDay() {
             const today = new Date().toLocaleDateString('en-CA');
             let lastDate = localStorage.getItem('awinet_last_date');
