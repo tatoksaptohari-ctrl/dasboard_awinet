@@ -8,23 +8,43 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; display: flex; justify-content: center; padding: 20px; padding-top: 80px; min-height: 100vh; }
+        
+        /* Navigasi */
         .btn-back-container { position: absolute; top: 15px; left: 15px; z-index: 1000; }
         .btn-back { background: #007bff; color: white; padding: 10px 15px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        
         .container { width: 100%; max-width: 550px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         header { text-align: center; margin-bottom: 20px; }
-        .logo-img { max-width: 120px; height: auto; margin-bottom: 10px; }
+        .logo-img { max-width: 130px; height: auto; margin-bottom: 10px; }
+        
+        /* Progres */
         .progress-section { margin-bottom: 20px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #eee; }
         .progress-bar { background: #ecf0f1; height: 12px; border-radius: 10px; overflow: hidden; margin-top: 5px; }
         #progressFill { background: #27ae60; height: 100%; width: 0%; transition: width 0.4s ease; }
-        .input-card { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 10px; }
-        input, button { padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
+        
+        /* Form Input */
+        .input-card { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 10px; border: 1px solid #ddd; }
+        input, button { padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; transition: 0.3s; }
         .btn-add { background: #007bff; color: white; font-weight: bold; cursor: pointer; border: none; }
-        .btn-wa { background: #25d366; color: white; font-weight: bold; cursor: pointer; border: none; width: 100%; margin-top: 10px; padding: 15px; font-size: 1rem; }
+        .btn-add:active { transform: scale(0.98); }
+        
+        /* List Tugas */
         .task-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #ddd; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
+        .task-info b { font-size: 1rem; color: #333; }
+        .task-info small { color: #777; }
+        
+        /* Status & Kontrol */
+        .controls { display: flex; align-items: center; gap: 12px; }
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; text-transform: uppercase; text-align: center; min-width: 70px; }
         .status-todo { background: #ffebee; color: #c62828; }
         .status-doing { background: #fff3e0; color: #ef6c00; }
         .status-done { background: #e8f5e9; color: #2e7d32; border-left-color: #27ae60; }
+        .btn-delete-item { color: #ff4d4d; cursor: pointer; font-size: 1.1rem; padding: 5px; }
+        
+        /* Tombol Aksi Bawah */
+        .btn-wa { background: #25d366; color: white; font-weight: bold; cursor: pointer; border: none; width: 100%; margin-top: 15px; padding: 15px; font-size: 1rem; }
+        .btn-clear-all { background: #6c757d; margin-top: 8px; padding: 10px; font-size: 0.85rem; }
+        
         #loading { display: none; text-align: center; color: #007bff; margin-bottom: 10px; font-weight: bold; }
     </style>
 </head>
@@ -40,7 +60,7 @@
             <h3>Monitoring Progres (Cloud)</h3>
         </header>
 
-        <div id="loading"><i class="fas fa-sync fa-spin"></i> Menghubungkan ke Cloud...</div>
+        <div id="loading"><i class="fas fa-sync fa-spin"></i> Memproses Cloud...</div>
 
         <div class="progress-section">
             <div style="display: flex; justify-content: space-between; font-weight: bold;">
@@ -54,8 +74,8 @@
             <input type="text" id="taskText" placeholder="Nama Pekerjaan">
             <input type="text" id="workerName" placeholder="Nama Teknisi">
             <div style="text-align: left;">
-                <label style="font-size: 0.8rem; font-weight: bold;">Tanggal Pelaksanaan:</label>
-                <input type="date" id="deadlineDate" style="width: 100%;">
+                <label style="font-size: 0.8rem; font-weight: bold; color: #555;">Tanggal Pelaksanaan:</label>
+                <input type="date" id="deadlineDate" style="width: 100%; margin-top: 4px;">
             </div>
             <button class="btn-add" onclick="addTask()">SIMPAN KE CLOUD</button>
         </div>
@@ -63,11 +83,11 @@
         <div id="taskList"></div>
 
         <button class="btn-wa" onclick="sendToWA()"><i class="fab fa-whatsapp"></i> KIRIM WA & SELESAI</button>
+        <button class="btn-wa btn-clear-all" onclick="deleteAllTasks()"><i class="fas fa-trash-alt"></i> HAPUS SEMUA DATA</button>
     </div>
 
     <script>
-        // URL SCRIPT ANDA
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbx4ayzcANEP0aeYTAbESDAIPW3x9A03uKYJBFmFhfbH9G1qgpoUe8xOZSdNe544bc9wbw/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyOu9pT1EWN-icCiChiBF1f7nepVB5-3VZqm99VoRFmsEZVK_s8egS_SCx1xZ2ozqJ1XQ/exec';
         let tasks = [];
 
         function showLoading(show) {
@@ -81,7 +101,7 @@
                 tasks = await response.json();
                 renderTasks();
                 updateProgress();
-            } catch (e) { console.log("Gagal memuat data cloud"); }
+            } catch (e) { console.error("Gagal sinkron data."); }
             showLoading(false);
         }
 
@@ -89,21 +109,12 @@
             const text = document.getElementById('taskText').value;
             const worker = document.getElementById('workerName').value;
             const deadline = document.getElementById('deadlineDate').value;
-            if (!text || !worker || !deadline) return alert("Isi semua kolom!");
+            if (!text || !worker || !deadline) return alert("Lengkapi semua data!");
 
             showLoading(true);
-            const data = { action: "add", id: Date.now().toString(), text, worker, deadline, status: 'todo' };
+            const payload = { action: "add", id: Date.now().toString(), text, worker, deadline, status: 'todo' };
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
 
-            // Menggunakan method POST dengan mode no-cors agar tidak diblokir Google
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            // Tunggu 2 detik agar Google selesai menulis, lalu refresh
             setTimeout(loadTasks, 2000);
             document.getElementById('taskText').value = '';
         }
@@ -112,14 +123,23 @@
             const task = tasks.find(t => t.id == id);
             const cycle = ['todo', 'doing', 'done'];
             const newStatus = cycle[(cycle.indexOf(task.status) + 1) % 3];
-
+            
             showLoading(true);
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: "update", id: id.toString(), status: newStatus })
-            });
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "update", id: id.toString(), status: newStatus }) });
+            setTimeout(loadTasks, 1500);
+        }
 
+        async function deleteTask(id) {
+            if (!confirm("Hapus tugas ini?")) return;
+            showLoading(true);
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "delete", id: id.toString() }) });
+            setTimeout(loadTasks, 1500);
+        }
+
+        async function deleteAllTasks() {
+            if (!confirm("Hapus seluruh data di Cloud?")) return;
+            showLoading(true);
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "deleteAll" }) });
             setTimeout(loadTasks, 2000);
         }
 
@@ -128,10 +148,13 @@
             list.innerHTML = '';
             tasks.forEach(t => {
                 const item = document.createElement('div');
-                item.className = 'task-item';
+                item.className = `task-item ${t.status === 'done' ? 'status-done' : ''}`;
                 item.innerHTML = `
-                    <div><b>${t.text}</b><br><small>${t.worker} | ${t.deadline}</small></div>
-                    <span class="status-badge status-${t.status}" onclick="updateStatus('${t.id}')">${t.status}</span>
+                    <div class="task-info"><b>${t.text}</b><br><small>${t.worker} | ${t.deadline}</small></div>
+                    <div class="controls">
+                        <span class="status-badge status-${t.status}" onclick="updateStatus('${t.id}')">${t.status}</span>
+                        <i class="fas fa-trash-alt btn-delete-item" onclick="deleteTask('${t.id}')"></i>
+                    </div>
                 `;
                 list.appendChild(item);
             });
@@ -146,17 +169,15 @@
 
         function sendToWA() {
             if (tasks.length === 0) return alert("Data kosong!");
-            let message = "*LAPORAN PROGRES HARIAN*\n";
+            let message = "*LAPORAN PROGRES HARIAN AwiNet*\n----------------------------------\n";
             tasks.forEach((t, i) => {
-                message += `${i+1}. ${t.text} - ${t.worker} (${t.status.toUpperCase()})\n`;
+                let s = t.status === 'done' ? "✅ DONE" : t.status === 'doing' ? "⏳ DOING" : "❌ TODO";
+                message += `${i+1}. *${t.text}*\nTeknisi: ${t.worker}\nStatus: ${s}\n\n`;
             });
+            message += `----------------------------------\n*Total Progres: ${document.getElementById('progressPercent').innerText}*`;
             
             window.open("https://wa.me/?text=" + encodeURIComponent(message), '_blank');
-
-            // Jeda 3 detik lalu kembali ke index
-            setTimeout(() => {
-                window.location.replace("index.html");
-            }, 3000);
+            setTimeout(() => { window.location.href = "index.html"; }, 3000);
         }
 
         loadTasks();
