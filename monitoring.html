@@ -97,28 +97,67 @@
         </button>
     </div>
 
-    <script>
-        // Inisialisasi Data
-        let tasks = JSON.parse(localStorage.getItem('awinet_tasks')) || [];
+    
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxm2bufGLDiSJMzJJABpL7oyPx89zIzPbBpXvS26MtGpqj2LIHW8HOZXtYnqQA0yh1F/exec';
+    let tasks = [];
+
+    // Ambil data dari Google Sheets saat load
+    async function loadTasks() {
+        const response = await fetch(scriptURL);
+        tasks = await response.json();
+        renderTasks();
+        updateProgress();
+    }
+
+    async function addTask() {
+        const text = document.getElementById('taskText').value;
+        const worker = document.getElementById('workerName').value;
+        const deadline = document.getElementById('deadlineDate').value;
+
+        if (!text || !worker || !deadline) return alert("Isi semua kolom!");
+
+        const newTask = { action: "add", id: Date.now(), text, worker, deadline, status: 'todo' };
+        
+        // Kirim ke Google Sheets
+        await fetch(scriptURL, {
+            method: 'POST',
+            body: JSON.stringify(newTask)
+        });
+
+        loadTasks(); // Refresh data
+        document.getElementById('taskText').value = '';
+    }
+
+    async function updateStatus(id) {
+        const task = tasks.find(t => t.id == id);
+        const cycle = ['todo', 'doing', 'done'];
+        const newStatus = cycle[(cycle.indexOf(task.status) + 1) % 3];
+
+        await fetch(scriptURL, {
+            method: 'POST',
+            body: JSON.stringify({ action: "update", id: id, status: newStatus })
+        });
+
+        loadTasks();
+    }
+
+    async function checkNewDay() {
+        const today = new Date().toLocaleDateString('en-CA');
         let lastDate = localStorage.getItem('awinet_last_date');
 
-        // FUNGSI CEK GANTI HARI (Hapus yang sudah SELESAI saja)
-        function checkNewDay() {
-            const today = new Date().toLocaleDateString('en-CA'); // Format YYYY-MM-DD
-
-            if (lastDate && lastDate !== today) {
-                // Filter: Simpan yang statusnya BELUM 'done'
-                const pendingTasks = tasks.filter(t => t.status !== 'done');
-                const deletedCount = tasks.length - pendingTasks.length;
-                
-                if (deletedCount > 0) {
-                    tasks = pendingTasks;
-                    saveAndRender();
-                    alert(deletedCount + " tugas selesai kemarin telah dihapus. Tugas yang tertunda tetap disimpan.");
-                }
-            }
-            localStorage.setItem('awinet_last_date', today);
+        if (lastDate && lastDate !== today) {
+            await fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify({ action: "clearDone" })
+            });
+            alert("Hari baru! Tugas yang selesai telah dibersihkan dari server.");
         }
+        localStorage.setItem('awinet_last_date', today);
+    }
+
+    // Jalankan startup
+    checkNewDay().then(() => loadTasks());
 
         function addTask() {
             const text = document.getElementById('taskText').value;
