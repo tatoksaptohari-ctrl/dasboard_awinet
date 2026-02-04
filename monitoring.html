@@ -3,207 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Teknisi - AwiNet</title>
+    <title>Monitoring AwiNet - Cloud</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Segoe UI', sans-serif; background: #f0f4f8; 
             display: flex; justify-content: center; padding: 20px; 
-            padding-top: 80px; /* Ruang agar tidak tertutup tombol kembali */
-            min-height: 100vh;
+            padding-top: 80px; min-height: 100vh; 
         }
 
-        /* Tombol Kembali Mengambang */
-        .btn-back-container {
-            position: absolute; top: 15px; left: 15px; z-index: 1000;
-        }
-        .btn-back {
+        /* Tombol Kembali Melayang */
+        .btn-back-container { position: absolute; top: 15px; left: 15px; z-index: 1000; }
+        .btn-back { 
             background: #007bff; color: white; padding: 10px 15px; 
             border-radius: 8px; text-decoration: none; font-weight: bold; 
-            font-size: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            display: flex; align-items: center; gap: 8px;
+            font-size: 12px; display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         .container { width: 100%; max-width: 550px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        
         header { text-align: center; margin-bottom: 20px; }
         .logo-img { max-width: 150px; height: auto; margin-bottom: 10px; }
 
         .progress-section { margin-bottom: 20px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #eee; }
         .progress-bar { background: #ecf0f1; height: 12px; border-radius: 10px; overflow: hidden; margin-top: 5px; }
         #progressFill { background: #27ae60; height: 100%; width: 0%; transition: width 0.4s ease; }
-        
+
         .input-card { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 10px; }
-        input, select, button { padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
+        input, button { padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; }
         .btn-add { background: #007bff; color: white; font-weight: bold; cursor: pointer; border: none; }
         .btn-wa { background: #25d366; color: white; font-weight: bold; cursor: pointer; border: none; width: 100%; margin-top: 10px; padding: 15px; font-size: 1rem; }
-        
-        .task-list { margin-top: 20px; }
+
         .task-item { 
             background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; 
-            border-left: 5px solid #ddd; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 5px solid #ddd; display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
         }
-        .task-info b { display: block; color: #333; }
-        .task-info span { font-size: 0.85rem; color: #666; }
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
         .status-todo { background: #ffebee; color: #c62828; }
         .status-doing { background: #fff3e0; color: #ef6c00; }
         .status-done { background: #e8f5e9; color: #2e7d32; border-left-color: #27ae60; }
+        
+        #loading { display: none; text-align: center; color: #007bff; margin-bottom: 10px; font-weight: bold; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
     <div class="btn-back-container">
-        <a href="index.html" class="btn-back">
-            <i class="fas fa-arrow-left"></i> MENU UTAMA
-        </a>
+        <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i> MENU UTAMA</a>
     </div>
 
     <div class="container">
         <header>
             <img src="logo.png" alt="AwiNet Logo" class="logo-img">
-            <h3 style="color: #333;">Monitoring Progres</h3>
+            <h3>Monitoring Progres (Cloud)</h3>
         </header>
+
+        <div id="loading"><i class="fas fa-spinner fa-spin"></i> Menghubungkan ke Server...</div>
 
         <div class="progress-section">
             <div style="display: flex; justify-content: space-between; font-weight: bold;">
-                <span>Total Progres Hari Ini</span>
+                <span>Total Progres Tim</span>
                 <span id="progressPercent">0%</span>
             </div>
             <div class="progress-bar"><div id="progressFill"></div></div>
         </div>
 
         <div class="input-card">
-    <input type="text" id="taskText" placeholder="Nama Pekerjaan (Contoh: Pasang ODP)">
-    <input type="text" id="workerName" placeholder="Nama Teknisi">
-    
-    <div style="text-align: left; margin-top: 5px;">
-        <label for="deadlineDate" style="font-size: 0.85rem; font-weight: bold; color: #555; margin-left: 5px;">
-            <i class="fas fa-calendar-alt"></i> Tanggal Pelaksanaan:
-        </label>
-        <input type="date" id="deadlineDate" style="width: 100%; margin-top: 5px;">
+            <input type="text" id="taskText" placeholder="Nama Pekerjaan">
+            <input type="text" id="workerName" placeholder="Nama Teknisi">
+            
+            <div style="text-align: left; margin-top: 5px;">
+                <label style="font-size: 0.85rem; font-weight: bold; color: #555;">
+                    <i class="fas fa-calendar-alt"></i> Tanggal Pelaksanaan:
+                </label>
+                <input type="date" id="deadlineDate" style="width: 100%; margin-top: 5px;">
+            </div>
+
+            <button class="btn-add" onclick="addTask()">SIMPAN KE CLOUD</button>
+        </div>
+
+        <div id="taskList"></div>
+
+        <button class="btn-wa" onclick="sendToWA()"><i class="fab fa-whatsapp"></i> KIRIM LAPORAN KE WA</button>
     </div>
 
-    <button class="btn-add" onclick="addTask()">TAMBAH KE DAFTAR</button>
-</div>
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxmT6T_uZukBxQRMYCdwJBjXqP6JUeGWst6x4byljm57i7cQ6XemAa3vad7EUzvSUkv/exec';
+        let tasks = [];
 
-
-        <div id="taskList" class="task-list"></div>
-
-        <button class="btn-wa" onclick="sendToWA()">
-            <i class="fab fa-whatsapp"></i> KIRIM LAPORAN KE WHATSAPP
-        </button>
-    </div>
-
-    
-<script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxm2bufGLDiSJMzJJABpL7oyPx89zIzPbBpXvS26MtGpqj2LIHW8HOZXtYnqQA0yh1F/exec';
-    let tasks = [];
-
-    // Ambil data dari Google Sheets saat load
-    async function loadTasks() {
-        const response = await fetch(scriptURL);
-        tasks = await response.json();
-        renderTasks();
-        updateProgress();
-    }
-
-    async function addTask() {
-        const text = document.getElementById('taskText').value;
-        const worker = document.getElementById('workerName').value;
-        const deadline = document.getElementById('deadlineDate').value;
-
-        if (!text || !worker || !deadline) return alert("Isi semua kolom!");
-
-        const newTask = { action: "add", id: Date.now(), text, worker, deadline, status: 'todo' };
-        
-        // Kirim ke Google Sheets
-        await fetch(scriptURL, {
-            method: 'POST',
-            body: JSON.stringify(newTask)
-        });
-
-        loadTasks(); // Refresh data
-        document.getElementById('taskText').value = '';
-    }
-
-    async function updateStatus(id) {
-        const task = tasks.find(t => t.id == id);
-        const cycle = ['todo', 'doing', 'done'];
-        const newStatus = cycle[(cycle.indexOf(task.status) + 1) % 3];
-
-        await fetch(scriptURL, {
-            method: 'POST',
-            body: JSON.stringify({ action: "update", id: id, status: newStatus })
-        });
-
-        loadTasks();
-    }
-
-    async function checkNewDay() {
-        const today = new Date().toLocaleDateString('en-CA');
-        let lastDate = localStorage.getItem('awinet_last_date');
-
-        if (lastDate && lastDate !== today) {
-            await fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify({ action: "clearDone" })
-            });
-            alert("Hari baru! Tugas yang selesai telah dibersihkan dari server.");
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
         }
-        localStorage.setItem('awinet_last_date', today);
-    }
 
-    // Jalankan startup
-    checkNewDay().then(() => loadTasks());
+        async function loadTasks() {
+            showLoading(true);
+            try {
+                const response = await fetch(scriptURL);
+                tasks = await response.json();
+                renderTasks();
+                updateProgress();
+            } catch (e) { console.error("Gagal memuat data:", e); }
+            showLoading(false);
+        }
 
-        function addTask() {
+        async function addTask() {
             const text = document.getElementById('taskText').value;
             const worker = document.getElementById('workerName').value;
             const deadline = document.getElementById('deadlineDate').value;
 
             if (!text || !worker || !deadline) return alert("Mohon lengkapi semua data!");
 
-            const newTask = { id: Date.now(), text, worker, deadline, status: 'todo' };
-            tasks.push(newTask);
-            saveAndRender();
-            
+            showLoading(true);
+            const data = { action: "add", id: Date.now(), text, worker, deadline, status: 'todo' };
+
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(data)
+            });
+
+            setTimeout(loadTasks, 1500);
             document.getElementById('taskText').value = '';
+            document.getElementById('workerName').value = '';
         }
 
-        function saveAndRender() {
-            localStorage.setItem('awinet_tasks', JSON.stringify(tasks));
-            renderTasks();
-            updateProgress();
+        async function updateStatus(id) {
+            const task = tasks.find(t => t.id == id);
+            const cycle = ['todo', 'doing', 'done'];
+            const newStatus = cycle[(cycle.indexOf(task.status) + 1) % 3];
+
+            showLoading(true);
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: "update", id: id, status: newStatus })
+            });
+
+            setTimeout(loadTasks, 1500);
+        }
+
+        async function checkNewDay() {
+            const today = new Date().toLocaleDateString('en-CA');
+            let lastDate = localStorage.getItem('awinet_last_date');
+
+            if (lastDate && lastDate !== today) {
+                showLoading(true);
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ action: "clearDone" })
+                });
+                alert("Hari baru! Tugas selesai kemarin telah dibersihkan.");
+                setTimeout(loadTasks, 1500);
+            }
+            localStorage.setItem('awinet_last_date', today);
         }
 
         function renderTasks() {
             const list = document.getElementById('taskList');
             list.innerHTML = '';
-            
             tasks.forEach(t => {
                 const item = document.createElement('div');
                 item.className = `task-item ${t.status === 'done' ? 'status-done' : ''}`;
                 item.innerHTML = `
-                    <div class="task-info">
-                        <b>${t.text}</b>
-                        <span>Teknisi: ${t.worker} | Tgl: ${t.deadline}</span>
-                    </div>
-                    <span class="status-badge status-${t.status}" onclick="updateStatus(${t.id})">
-                        ${t.status}
-                    </span>
+                    <div><b>${t.text}</b><br><small>${t.worker} | ${t.deadline}</small></div>
+                    <span class="status-badge status-${t.status}" onclick="updateStatus(${t.id})">${t.status}</span>
                 `;
                 list.appendChild(item);
             });
-        }
-
-        function updateStatus(id) {
-            const task = tasks.find(t => t.id === id);
-            const cycle = ['todo', 'doing', 'done'];
-            task.status = cycle[(cycle.indexOf(task.status) + 1) % 3];
-            saveAndRender();
         }
 
         function updateProgress() {
@@ -214,34 +183,23 @@
         }
 
         function sendToWA() {
-            if (tasks.length === 0) return alert("Belum ada data untuk dilaporkan!");
-            
+            if (tasks.length === 0) return alert("Data kosong!");
             const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-            
-            let message = "*LAPORAN PROGRES HARIAN TEKNISI*\n";
-            message += "--------------------------------------\n";
+            let message = "*LAPORAN PROGRES HARIAN TEKNISI*\n--------------------------------------\n";
             
             tasks.forEach((t, i) => {
                 const dateObj = new Date(t.deadline);
                 const hari = namaHari[dateObj.getDay()];
                 let s = t.status === 'done' ? "✅ SELESAI" : t.status === 'doing' ? "⏳ PROSES" : "❌ TODO";
-                
-                message += `${i+1}. *${t.text}*\n`;
-                message += `   Hari: ${hari}, ${t.deadline}\n`;
-                message += `   Teknisi: ${t.worker}\n`;
-                message += `   Status: ${s}\n\n`;
+                message += `${i+1}. *${t.text}*\nHari: ${hari}, ${t.deadline}\nTeknisi: ${t.worker}\nStatus: ${s}\n\n`;
             });
-
-            const progress = document.getElementById('progressPercent').innerText;
-            message += `--------------------------------------\n*TOTAL PROGRES: ${progress}*`;
-
-            window.open("https://wa.me/?text=" + encodeURIComponent(message), '_blank');
+            
+            message += `--------------------------------------\n*TOTAL PROGRES: ${document.getElementById('progressPercent').innerText}*`;
+            window.open("https://wa.me/?text=" + encodeURIComponent(message));
         }
 
-        // Jalankan saat startup
         checkNewDay();
-        renderTasks();
-        updateProgress();
+        loadTasks();
     </script>
 </body>
 </html>
